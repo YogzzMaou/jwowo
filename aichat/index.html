@@ -1,0 +1,595 @@
+<Script Language='Javascript'>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aina AI | Chatbot</title>
+<link rel="stylesheet" href="styles.css">
+
+<!-- =====BOX ICONS===== -->
+<link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+<link rel="icon" href="https://telegra.ph/file/53e5da94fede27bb79047.jpg" type="image/x-icon">
+<meta name="description" content="Aina AI (Artificial Intelligence)">
+<meta name="author" content="Hikaru Youki">
+<meta property="og:image" content="https://telegra.ph/file/53e5da94fede27bb79047.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.min.css'>
+<style>
+/*--------------------
+Mixins
+--------------------*/
+/*--------------------
+Body
+--------------------*/
+*,
+*::before,
+*::after {
+box-sizing: border-box;
+}
+
+html {
+height: 100%;
+width: 100%;
+}
+
+body {
+height: 100%;
+}
+
+body {
+background: linear-gradient(135deg, #044f48, #2a7561);
+background-size: cover;
+font-family: "Open Sans", sans-serif;
+font-size: 12px;
+line-height: 1.3;
+overflow: hidden;
+}
+
+.bg {
+width: 100%;
+height: 100%;
+top: 0;
+left: 0;
+z-index: 1;
+background: url("https://images.unsplash.com/photo-1451186859696-371d9477be93?crop=entropy&fit=crop&fm=jpg&h=975&ixjsv=2.1.0&ixlib=rb-0.3.5&q=80&w=1925") no-repeat 0 0;
+filter: blur(80px);
+transform: scale(1.2);
+}
+
+/*--------------------
+Chat
+--------------------*/
+.chat {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 300px;
+height: 80vh;
+max-height: 500px;
+z-index: 2;
+overflow: hidden;
+box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+background: rgba(0, 0, 0, 0.5);
+border-radius: 20px;
+display: flex;
+justify-content: space-between;
+flex-direction: column;
+}
+
+/*--------------------
+Chat Title
+--------------------*/
+.chat-title {
+flex: 0 1 45px;
+position: relative;
+z-index: 2;
+background: rgba(0, 0, 0, 0.2);
+color: #fff;
+text-transform: uppercase;
+text-align: left;
+padding: 10px 10px 10px 50px;
+}
+
+.chat-title h1, .chat-title h2 {
+font-weight: normal;
+font-size: 10px;
+margin: 0;
+padding: 0;
+}
+
+.chat-title h2 {
+color: rgba(255, 255, 255, 0.5);
+font-size: 8px;
+letter-spacing: 1px;
+}
+
+.chat-title .avatar {
+position: absolute;
+z-index: 1;
+top: 8px;
+left: 9px;
+border-radius: 30px;
+width: 30px;
+height: 30px;
+overflow: hidden;
+margin: 0;
+padding: 0;
+border: 2px solid rgba(255, 255, 255, 0.24);
+}
+.chat-title .avatar img {
+width: 100%;
+height: auto;
+}
+
+/*--------------------
+Messages
+--------------------*/
+.messages {
+flex: 1 1 auto;
+color: rgba(255, 255, 255, 0.5);
+overflow: hidden;
+position: relative;
+width: 100%;
+}
+
+.messages .messages-content {
+position: absolute;
+top: 0;
+left: 0;
+height: 101%;
+width: 100%;
+}
+
+.messages .message {
+clear: both;
+float: left;
+padding: 6px 10px 7px;
+border-radius: 10px 10px 10px 0;
+background: rgba(0, 0, 0, 0.3);
+margin: 8px 0;
+font-size: 11px;
+line-height: 1.4;
+margin-left: 35px;
+position: relative;
+text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+.messages .message .timestamp {
+position: absolute;
+bottom: -15px;
+font-size: 9px;
+color: rgba(255, 255, 255, 0.3);
+}
+.messages .message::before {
+content: "";
+position: absolute;
+bottom: -6px;
+border-top: 6px solid rgba(0, 0, 0, 0.3);
+left: 0;
+border-right: 7px solid transparent;
+}
+.messages .message .avatar {
+position: absolute;
+z-index: 1;
+bottom: -15px;
+left: -35px;
+border-radius: 30px;
+width: 30px;
+height: 30px;
+overflow: hidden;
+margin: 0;
+padding: 0;
+border: 2px solid rgba(255, 255, 255, 0.24);
+}
+
+.messages .message .avatar img {
+width: 100%;
+height: auto;
+}
+
+.messages .message.message-personal {
+float: right;
+color: #fff;
+text-align: right;
+background: linear-gradient(120deg, #248A52, #257287);
+border-radius: 10px 10px 0 10px;
+}
+
+.messages .message.message-personal::before {
+left: auto;
+right: 0;
+border-right: none;
+border-left: 5px solid transparent;
+border-top: 4px solid #257287;
+bottom: -4px;
+}
+
+.messages .message:last-child {
+margin-bottom: 30px;
+}
+
+.messages .message.new {
+transform: scale(0);
+transform-origin: 0 0;
+-webkit-animation: bounce 500ms linear both;
+animation: bounce 500ms linear both;
+}
+.messages .message.loading::before {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+content: "";
+display: block;
+width: 3px;
+height: 3px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.5);
+z-index: 2;
+margin-top: 4px;
+-webkit-animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+border: none;
+-webkit-animation-delay: 0.15s;
+animation-delay: 0.15s;
+}
+
+.messages .message.loading span {
+display: block;
+font-size: 0;
+width: 20px;
+height: 10px;
+position: relative;
+}
+.messages .message.loading span::before {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+content: "";
+display: block;
+width: 3px;
+height: 3px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.5);
+z-index: 2;
+margin-top: 4px;
+-webkit-animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+margin-left: -7px;
+}
+.messages .message.loading span::after {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+content: "";
+display: block;
+width: 3px;
+height: 3px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.5);
+z-index: 2;
+margin-top: 4px;
+-webkit-animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+animation: ball 0.45s cubic-bezier(0, 0, 0.15, 1) alternate infinite;
+margin-left: 7px;
+-webkit-animation-delay: 0.3s;
+animation-delay: 0.3s;
+}
+
+/*--------------------
+Message Box
+--------------------*/
+.message-box {
+flex: 0 1 40px;
+width: 100%;
+background: rgba(0, 0, 0, 0.3);
+padding: 10px;
+position: relative;
+}
+.message-box .message-input {
+background: none;
+border: none;
+outline: none !important;
+resize: none;
+color: rgba(255, 255, 255, 0.7);
+font-size: 11px;
+height: 17px;
+margin: 0;
+padding-right: 20px;
+width: 265px;
+}
+.message-box textarea:focus:-webkit-placeholder {
+color: transparent;
+}
+.message-box .message-submit {
+position: absolute;
+z-index: 1;
+top: 9px;
+right: 10px;
+color: #fff;
+border: none;
+background: #248A52;
+font-size: 10px;
+text-transform: uppercase;
+line-height: 1;
+padding: 6px 10px;
+border-radius: 10px;
+outline: none !important;
+transition: background 0.2s ease;
+}
+.message-box .message-submit:hover {
+background: #1D7745;
+}
+
+/*--------------------
+Custom Srollbar
+--------------------*/
+.mCSB_scrollTools {
+margin: 1px -3px 1px 0;
+opacity: 0;
+}
+
+.mCSB_inside > .mCSB_container {
+margin-right: 0px;
+padding: 0 10px;
+}
+
+.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
+background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/*--------------------
+Bounce
+--------------------*/
+@-webkit-keyframes bounce {
+0% {
+transform: matrix3d(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+4.7% {
+transform: matrix3d(0.45, 0, 0, 0, 0, 0.45, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+9.41% {
+transform: matrix3d(0.883, 0, 0, 0, 0, 0.883, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+14.11% {
+transform: matrix3d(1.141, 0, 0, 0, 0, 1.141, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+18.72% {
+transform: matrix3d(1.212, 0, 0, 0, 0, 1.212, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+24.32% {
+transform: matrix3d(1.151, 0, 0, 0, 0, 1.151, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+29.93% {
+transform: matrix3d(1.048, 0, 0, 0, 0, 1.048, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+35.54% {
+transform: matrix3d(0.979, 0, 0, 0, 0, 0.979, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+41.04% {
+transform: matrix3d(0.961, 0, 0, 0, 0, 0.961, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+52.15% {
+transform: matrix3d(0.991, 0, 0, 0, 0, 0.991, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+63.26% {
+transform: matrix3d(1.007, 0, 0, 0, 0, 1.007, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+85.49% {
+transform: matrix3d(0.999, 0, 0, 0, 0, 0.999, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+100% {
+transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+}
+@keyframes bounce {
+0% {
+transform: matrix3d(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+4.7% {
+transform: matrix3d(0.45, 0, 0, 0, 0, 0.45, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+9.41% {
+transform: matrix3d(0.883, 0, 0, 0, 0, 0.883, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+14.11% {
+transform: matrix3d(1.141, 0, 0, 0, 0, 1.141, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+18.72% {
+transform: matrix3d(1.212, 0, 0, 0, 0, 1.212, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+24.32% {
+transform: matrix3d(1.151, 0, 0, 0, 0, 1.151, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+29.93% {
+transform: matrix3d(1.048, 0, 0, 0, 0, 1.048, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+35.54% {
+transform: matrix3d(0.979, 0, 0, 0, 0, 0.979, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+41.04% {
+transform: matrix3d(0.961, 0, 0, 0, 0, 0.961, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+52.15% {
+transform: matrix3d(0.991, 0, 0, 0, 0, 0.991, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+63.26% {
+transform: matrix3d(1.007, 0, 0, 0, 0, 1.007, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+85.49% {
+transform: matrix3d(0.999, 0, 0, 0, 0, 0.999, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+100% {
+transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+}
+@-webkit-keyframes ball {
+from {
+transform: translateY(0) scaleY(0.8);
+}
+to {
+transform: translateY(-10px);
+}
+}
+@keyframes ball {
+from {
+transform: translateY(0) scaleY(0.8);
+}
+to {
+transform: translateY(-10px);
+}
+}
+</style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+
+<div class="chat">
+<div class="chat-title">
+<h1>Aina AI</h1>
+<h2>Online Artificial Intelligence</h2>
+<figure class="avatar">
+<img src="https://telegra.ph/file/53e5da94fede27bb79047.jpg" /></figure>
+</div>
+<div class="messages">
+<div class="messages-content"></div>
+</div>
+<div class="message-box">
+<textarea type="text" id="message-input" class="message-input" placeholder="Type message..."></textarea>
+<button type="submit" class="message-submit">Send</button>
+</div>
+
+</div>
+<div class="bg"></div>
+<!-- partial -->
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.concat.min.js'></script>
+<audio src="https://github.com/Jabalsurya2105/database/raw/master/music/impossible.mp3" id="musik" loop></audio>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+let musik = document.getElementById('musik');
+
+Swal.fire({
+title: "Welcome To",
+text: "Aina AI Dibuat oleh Hikaru Youki",
+imageUrl: "https://feeldreams.github.io/cilukba.gif",
+imageWidth: 200,
+imageHeight: 200,
+imageAlt: "Hikaru Youki"
+}).then(async() => await musik.play())
+})
+</script>
+<script>
+var $messages = $('.messages-content'),
+message = 'haiii, aku Aina AI, kalau kamu siapa??';
+
+$(window).load(function() {
+$messages.mCustomScrollbar();
+setTimeout(function() {
+fakeMessage();
+}, 100);
+});
+
+function updateScrollbar() {
+$messages.mCustomScrollbar("update").mCustomScrollbar('scrollTo', 'bottom', {
+scrollInertia: 10,
+timeout: 0
+});
+}
+
+function setDate(){
+var date = new Date();
+$('<div class="timestamp">' + date.getHours() + ":" + date.getMinutes() + '</div>').appendTo($('.message:last'));
+}
+
+function insertMessage() {
+msg = $('.message-input').val();
+message = msg;
+if ($.trim(msg) == '') {
+return false;
+}
+$('<div class="message message-personal">' + msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+setDate();
+$('.message-input').val(null);
+updateScrollbar();
+setTimeout(function() {
+fakeMessage();
+}, 1000 + (Math.random() * 20) * 100);
+}
+
+$('.message-submit').click(function() {
+insertMessage();
+
+});
+
+$(window).on('keydown', function(e) {
+if (e.which == 13) {
+insertMessage();
+return false;
+}
+})
+
+async function Lbbai(input) {
+const today = new Date();
+const date = new Date(today.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
+const hours = date.getHours();
+const minutes = date.getMinutes();
+const day = today.getDate();
+const month = today.getMonth() + 1; // perhatikan bahwa bulan dimulai dari 0, maka ditambahkan 1.
+const year = today.getFullYear();
+// mengambil nama hari dalam bahasa Inggris.
+const dayOfWeek = today.toLocaleDateString("id-ID", { weekday: "long" });
+const timeNow = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+const getTodayDate = `Hari ini adalah ${dayOfWeek}, ${day}/${month}/${year}.`;
+
+const sistem = `kamu Adalah Aina, Chat Bot dengan program kecerdasan buatan AI (artificial intelligence). jawab setiap pertanyaan dengan jawaban yang edukatif, jika ada yang bertanya tentang waktu kamu jawab yang berkaitan dengan ${timeNow} dan ${getTodayDate}, kamu memiliki sifat dingin dan sedikit tsundere imut, kamu dirancang dan dikembangkan oleh Hikaru Youki, nama aslinya adalah Yogi Pradana Setiawan, Hikaru Youki berasal dari Mojokerto, lahir pada 30 mei 2005, dia adalah seseorang yang kreatif dan berbakat dalam menciptakan berbagai hal, dia juga seseorang yang sangat baik kepada semua orang, sering berbagi salah satunya di https://hikaruyouki.biz.id/freeforall .`
+const messages = [
+{ role: "system", content: sistem },
+{ role: "user", content: input },
+];
+
+try {
+const response = await fetch("https://deepenglish.com/wp-json/ai-chatbot/v1/chat", {
+method: "POST",
+headers: {
+Accept: "text/event-stream",
+"Content-Type": "application/json",
+},
+body: JSON.stringify({ messages }),
+});
+
+const responseData = await response.json();
+return responseData.answer.replace(/```/g, ' ');
+} catch (error) {
+console.error("Error fetching data:", error);
+throw error;
+}
+}
+
+async function fakeMessage() {
+var messages = message;
+if (messages != 'haii, aku Aina AI, kalau kamu siapaa??') messages = await Lbbai(messages);
+
+if ($('.message-input').val() != '') {
+return false;
+}
+$('<div class="message loading new"><figure class="avatar"><img src="https://telegra.ph/file/53e5da94fede27bb79047.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
+updateScrollbar();
+
+setTimeout(function() {
+$('.message.loading').remove();
+$('<div class="message new"><figure class="avatar"><img src="https://telegra.ph/file/53e5da94fede27bb79047.jpg" /></figure>' + messages + '</div>').appendTo($('.mCSB_container')).addClass('new');
+setDate();
+updateScrollbar();
+}, 1000);
+
+}
+</script>
+</body>
+</html>
+  </Script>
